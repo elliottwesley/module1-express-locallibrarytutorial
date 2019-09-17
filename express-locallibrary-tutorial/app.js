@@ -18,6 +18,16 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+// set up a Mongoose connection
+var mongoose = require('mongoose')
+var mongoDB = 'mongodb+srv://elliottwesley:FtzPzi3s7@wre-learningmongo-ht4jt.mongodb.net/local_library?retryWrites=true&w=majority';
+mongoose.connect(mongoDB, {
+ useNewUrlParser: true,
+ useUnifiedTopology: true
+});
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
 
 
 // view engine setup
