@@ -169,7 +169,7 @@ exports.author_update_get = function(req, res, next) {
 
 };
 
-// Handle book update on POST.
+// Handle author update on POST.
 exports.author_update_post = [
 
     // Validate fields.
