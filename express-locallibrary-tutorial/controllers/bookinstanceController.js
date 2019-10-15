@@ -72,7 +72,7 @@ exports.bookinstance_create_post = [
           { book: req.body.book,
             imprint: req.body.imprint,
             status: req.body.status,
-            due_back: req.body.due_back
+            due_back: req.body.due_back 
            });
 
         if (!errors.isEmpty()) {
@@ -140,7 +140,7 @@ exports.bookinstance_update_get = function(req, res) {
     // Get book and book instance for form.
     async.parallel({
         book: function(callback) {
-            Book.findById(req.params.id).populate('book').exec(callback);
+            Book.find(callback);
           },
         bookinstance: function(callback) {
             BookInstance.findById(req.params.id).populate('bookinstance').exec(callback);
@@ -153,7 +153,7 @@ exports.bookinstance_update_get = function(req, res) {
                 return next(err);
             }
             // Success.
-            res.render('bookinstance_form', { title: 'Update Book Instance', bookinstance: results.bookinstance });
+            res.render('bookinstance_form', { title: 'Update Book Instance', bookinstance: results.bookinstance, book_list: results.book });
         });
 
 };
@@ -178,12 +178,13 @@ exports.bookinstance_update_post = function(req, res) {
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
-        // Create a Book object with escaped/trimmed data and old id.
+        // Create a Book Instance object with escaped/trimmed data and old id.
         var bookinstance = new BookInstance(
           { book: req.body.book,
             imprint: req.body.imprint,
             status: req.body.status,
-            due_back: req.body.due_back
+            due_back: req.body.due_back,
+            _id:req.params.id
            });
 
         if (!errors.isEmpty()) {
