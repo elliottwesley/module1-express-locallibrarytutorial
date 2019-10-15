@@ -164,7 +164,7 @@ exports.author_update_get = function(req, res, next) {
             return next(err);
         }
         // Successful, so render.
-        res.render('author_update', { title: 'Update Author', author: results.author, author_books: results.authors_books } );
+        res.render('author_form', { title: 'Update Author', author: results.author, author_books: results.authors_books } );
     });
 
 };

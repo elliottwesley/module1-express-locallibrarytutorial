@@ -1,4 +1,6 @@
 const validator = require('express-validator');
+const { body,validationResult } = require('express-validator');
+const { sanitizeBody } = require('express-validator');
 var async = require('async');
 var Genre = require('../models/genre');
 var Book = require('../models/book');
@@ -122,11 +124,6 @@ exports.genre_delete_get = function(req, res, next) {
 };
 
 // Handle Genre delete on POST.
-/*
-exports.genre_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete POST');
-};
-*/
 exports.genre_delete_post = function(req, res, next) {
 
     async.parallel({
@@ -158,10 +155,63 @@ exports.genre_delete_post = function(req, res, next) {
 
 // Display Genre update form on GET.
 exports.genre_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update GET');
+    
+    // Get genre for form.
+    async.parallel({
+        genre: function(callback) {
+            Genre.findById(req.params.id).populate('genre').exec(callback);
+          }
+        }, function(err, results) {
+            if (err) { return next(err); }
+            if (results.genre==null) { // No results.
+                var err = new Error('Genre not found');
+                err.status = 404;
+                return next(err);
+            }
+            // Success.
+            res.render('genre_form', { title: 'Update Genre', genre: results.genre });
+        });
+
 };
 
 // Handle Genre update on POST.
 exports.genre_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update POST');
+
+    // Validate field.
+    body('name', 'Name must be specified').isLength({ min: 1 }).trim(),
+
+    // Sanitize field.
+    sanitizeBody('name').escape(),
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Genre object with escaped/trimmed data and old id.
+        var genre = new Genre(
+          { name: req.body.name });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+
+            // Get genre for form.
+            async.parallel({
+                genre: function(callback) {
+            Genre.findById(req.params.id).populate('genre').exec(callback);
+                }
+            });
+            return;
+        }
+        else {
+            // Data from form is valid. Update the record.
+            Genre.findByIdAndUpdate(req.params.id, genre, {}, function (err,thegenre) {
+                if (err) { return next(err); }
+                   // Successful - redirect to genre detail page.
+                   res.redirect(thegenre.url);
+                });
+        }
+    }
+
 };
