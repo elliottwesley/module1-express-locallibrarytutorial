@@ -8,7 +8,7 @@ var GenreSchema = new Schema(
   }
 );
 
-// Virtual for bookinstance's URL
+// Virtual for genre's URL
 GenreSchema
 .virtual('url')
 .get(function () {
