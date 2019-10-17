@@ -135,7 +135,7 @@ exports.bookinstance_delete_post = function(req, res, next) {
 };
 
 // Display BookInstance update form on GET.
-exports.bookinstance_update_get = function(req, res) {
+exports.bookinstance_update_get = function(req, res, next) {
 
     // Get book and book instance for form.
     async.parallel({
@@ -153,13 +153,13 @@ exports.bookinstance_update_get = function(req, res) {
                 return next(err);
             }
             // Success.
-            res.render('bookinstance_form', { title: 'Update Book Instance', bookinstance: results.bookinstance, book_list: results.book });
+            res.render('bookinstance_form', { title: 'Update Book Instance', book_list: results.book, selected_book: results.bookinstance.book._id , bookinstance: results.bookinstance  });
         });
 
 };
 
 // Handle bookinstance update on POST.
-exports.bookinstance_update_post = function(req, res) {
+exports.bookinstance_update_post = [
 
     // Validate fields.
     body('book', 'Book must be specified').isLength({ min: 1 }).trim(),
@@ -178,7 +178,7 @@ exports.bookinstance_update_post = function(req, res) {
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
-        // Create a Book Instance object with escaped/trimmed data and old id.
+        // Create a Book Instance object with escaped/trimmed data and current id.
         var bookinstance = new BookInstance(
           { book: req.body.book,
             imprint: req.body.imprint,
@@ -193,14 +193,15 @@ exports.bookinstance_update_post = function(req, res) {
             // Get all authors and genres for form.
             async.parallel({
               book: function(callback) {
-                Book.findById(req.params.id).populate('book').exec(callback);
+                Book.find(callback);
                 },
             bookinstance: function(callback) {
               BookInstance.findById(req.params.id).populate('bookinstance').exec(callback);
                 }
             }, function(err, results) {
                 if (err) { return next(err); }
-              res.render('book_form', { title: 'Update Book',authors: results.authors, genres: results.genres, book: book, errors: errors.array() });
+              // Successful, render it.
+              res.render('bookinstance_form', { title: 'Update BookInstance', book_list: results.book, selected_book: results.bookinstance.book._id , errors: errors.array(), bookinstance: results.bookinstance });
             });
             return;
         }
@@ -213,4 +214,4 @@ exports.bookinstance_update_post = function(req, res) {
                 });
         }
     }
-};
+];

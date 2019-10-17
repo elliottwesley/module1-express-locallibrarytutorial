@@ -23,7 +23,7 @@ AuthorSchema
 AuthorSchema
 .virtual('lifespan')
 .get(function () {
-  return ( this.date_of_birth ? moment(this.date_of_birth).format('MMMM Do, YYYY') : '' ) + " - "  + ( this.date_of_death ? moment(this.date_of_death).format('MMMM Do, YYYY') : '' );
+  return ( this.date_of_birth ? moment(this.date_of_birth).utc().format('MMMM Do, YYYY') : '' ) + " - "  + ( this.date_of_death ? moment(this.date_of_death).utc().format('MMMM Do, YYYY') : '' );
     // the above line checks if there is a value for date_of_birth, applying (and formatting, thanks to the npm moment package) if there is one, otherwise returning a blank string.  Same for date_of_death.
     // Otherwise, today's date would be erroneously applied to both of these.
 });

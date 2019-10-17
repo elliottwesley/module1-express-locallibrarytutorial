@@ -62,7 +62,7 @@ exports.genre_create_post =  [
   (req, res, next) => {
 
     // Extract the validation errors from a request.
-    const errors = validator.validationResult(req);
+    const errors = validationResult(req);
 
     // Create a genre object with escaped and trimmed data.
     var genre = new Genre(
@@ -153,7 +153,7 @@ exports.genre_delete_post = function(req, res, next) {
 
 
 // Display Genre update form on GET.
-exports.genre_update_get = function(req, res) {
+exports.genre_update_get = function(req, res, next) {
     
     // Get genre for form.
     async.parallel({
@@ -173,8 +173,8 @@ exports.genre_update_get = function(req, res) {
 
 };
 
-// Handle Genre update on POST.
-exports.genre_update_post = function(req, res) {
+// Handle genre update on POST.
+exports.genre_update_post = [
 
     // Validate field.
     body('name', 'Name must be specified').isLength({ min: 1 }).trim(),
@@ -196,13 +196,7 @@ exports.genre_update_post = function(req, res) {
 
         if (!errors.isEmpty()) {
             // There are errors. Render form again with sanitized values/error messages.
-
-            // Get genre for form.
-            async.parallel({
-                genre: function(callback) {
-            Genre.findById(req.params.id).populate('genre').exec(callback);
-                }
-            });
+			res.render('genre_form', { title: 'Update Genre', genre: results.genre, errors: errors.array()});
             return;
         }
         else {
@@ -215,4 +209,4 @@ exports.genre_update_post = function(req, res) {
         }
     }
 
-};
+];
